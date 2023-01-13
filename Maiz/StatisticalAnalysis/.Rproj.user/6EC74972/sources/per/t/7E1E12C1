@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1580228567046.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1847301975",
+    "id" : "7E1E12C1",
+    "lastKnownWriteTime" : 1544462358,
+    "last_content_update" : 1544462358,
+    "path" : "E:/R/Expmto2017/MAIZ/EurochemScripts/StatisticalAnalysis/00_Prepararacion.R",
+    "project_path" : "00_Prepararacion.R",
+    "properties" : {
+        "cursorPosition" : "55,0",
+        "scrollLine" : "37"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

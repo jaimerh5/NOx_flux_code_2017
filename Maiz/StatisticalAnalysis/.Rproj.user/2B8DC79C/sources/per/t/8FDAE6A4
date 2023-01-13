@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1545222534639.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1000737236",
+    "id" : "8FDAE6A4",
+    "lastKnownWriteTime" : 1545248346,
+    "last_content_update" : 1545248346474,
+    "path" : "C:/R/Expmto2017/MAIZ/EurochemScripts/StatisticalAnalysis/BusqdaModelos.R",
+    "project_path" : "BusqdaModelos.R",
+    "properties" : {
+        "cursorPosition" : "7,17",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

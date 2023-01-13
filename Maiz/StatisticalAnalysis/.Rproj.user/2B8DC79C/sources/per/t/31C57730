@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1545216759029.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1980686551",
+    "id" : "31C57730",
+    "lastKnownWriteTime" : 1545222475,
+    "last_content_update" : 1545222475364,
+    "path" : "C:/R/Expmto2017/MAIZ/EurochemScripts/StatisticalAnalysis/AnalisysRMAnova_GHG.R",
+    "project_path" : "AnalisysRMAnova_GHG.R",
+    "properties" : {
+        "cursorPosition" : "159,29",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

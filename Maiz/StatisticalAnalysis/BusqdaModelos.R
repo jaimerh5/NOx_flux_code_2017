@@ -1,0 +1,78 @@
+setwd('C:/Users/JaimeRecio/Documents/Expmto2017/MAIZ/ANALISIS ESTADISTICO')
+Corr.input <- read.table('inputCorrelacionar_H.csv',sep=';',dec='.',header = T)
+correlate(Corr.input[,5:11],corr.method = 'pearson')
+rcorr.adjust(Corr.input[,5:11],type = 'pearson',use = 'pairwise')
+# Pearson correlations:
+#           NO     NO2     N2O     NH4     NO3   Tsoil    WFPS
+# NO     1.0000  0.8093  0.1655  0.1665  0.3750 -0.2636 -0.1432
+# NO2    0.8093  1.0000  0.0588  0.1343  0.5188 -0.3409 -0.2205
+# N2O    0.1655  0.0588  1.0000  0.6509 -0.0213 -0.0883  0.1520
+# NH4    0.1665  0.1343  0.6509  1.0000  0.1866 -0.1816  0.0086
+# NO3    0.3750  0.5188 -0.0213  0.1866  1.0000 -0.3292 -0.1822
+# Tsoil -0.2636 -0.3409 -0.0883 -0.1816 -0.3292  1.0000  0.2235
+# WFPS  -0.1432 -0.2205  0.1520  0.0086 -0.1822  0.2235  1.0000
+
+# Pairwise two-sided p-values:
+#         NO     NO2    N2O    NH4    NO3    Tsoil  WFPS  
+# NO           <.0001 0.0589 0.0574 <.0001 0.0023 0.1028
+# NO2   <.0001        0.5048 0.1261 <.0001 <.0001 0.0114
+# N2O   0.0589 0.5048        <.0001 0.8089 0.3156 0.0831
+# NH4   0.0574 0.1261 <.0001        0.0328 0.0379 0.9228
+# NO3   <.0001 <.0001 0.8089 0.0328        0.0001 0.0373
+# Tsoil 0.0023 <.0001 0.3156 0.0379 0.0001        0.0103
+# WFPS  0.1028 0.0114 0.0831 0.9228 0.0373 0.0103       
+
+lm.1 <- lm(NO~WFPS+Tsoil, data=Corr.input)
+summary(lm.1)
+splom(Corr.input[,5:11])
+library(scatterplot3d); library("rgl") #con rgl cargas plot3D
+att1<- scatterplot3d(x=Corr.input$WFPS,y=Corr.input$Tsoil,z=Corr.input$NO,
+                     ty='p',highlight.3d=F,pch=20, #col='#525252',
+                     xlab='WFPS (mm)',ylab='Tsoil (ºC)',zlab= 'Flux NO_U (ug m-2 h-1)')
+att1$plane3d(lm.1,lty.box = "solid",col='#00000')
+plot3d(x=Corr.input$WFPS,y=Corr.input$Tsoil,z=Corr.input$NO,
+       type = 's', col='black')
+
+splom(Relate_U[idx,1:5])
+xyplot(NO~NO2, ty=c('p','r'), data=Corr.input)
+lm.2 <- lm(NO2~NO3+NO, data=Corr.input)
+
+summary(lm.2)
+res.lm.2 <- residuals(lm.2)
+qqnorm(res.lm.2);qqline(res.lm.2)
+plotNormalHistogram(res.lm.2)
+plot(res.lm.2~fitted(lm.2)) #todos los valores<3
+abline(h=0, lwd=0.4, col='blue');abline(h=c(-3,3), lty='dotted', col='blue');
+outlierTest(lm.2)
+att2<- scatterplot3d(x=Corr.input$NO3,y=Corr.input$NO,z=Corr.input$NO2,
+                     ty='p',highlight.3d=F,pch=20, #col='#525252',
+                     xlab='WFPS (mm)',ylab='Tsoil (ºC)',zlab= 'Flux NO_U (ug m-2 h-1)')
+att2$plane3d(lm.2,lty.box = "solid",col='#525252')
+
+
+lm.3 <- lm(NO2~NO3+Tsoil, data=Corr.input)
+summary(lm.3)
+res.lm.3 <- residuals(lm.3)
+qqnorm(res.lm.3);qqline(res.lm.3)
+plotNormalHistogram(res.lm.3)
+plot(res.lm.3~fitted(lm.3)) #todos los valores<3
+abline(h=0, lwd=0.4, col='blue');abline(h=c(-3,3), lty='dotted', col='blue');
+outlierTest(lm.3)
+
+att3<- scatterplot3d(x=Corr.input$NO3,y=Corr.input$Tsoil,z=Corr.input$NO2,
+                     ty='p',highlight.3d=F,pch=1) #col='#525252')
+                     
+att3$plane3d(lm.3,lty.box = "solid",col='#525252')
+plot3d(x=Corr.input$NO3,y=Corr.input$Tsoil,z=Corr.input$NO2,
+       type = 's', col='black')
+library(plotly)
+library(plot3D)
+library("devtools")
+
+attach(Corr.input)
+plot_ly(x = WFPS, y = Tsoil, z = NO, type = "contour",
+        autocontour = F,
+        # contours = list(start = -50,end = 150,size = 10),%>% list(showlabels = TRUE))
+        contours = list(start = -10,end = 50,size = 10, showlabels = TRUE,coloring = 'heatmap'),  
+        line = list(smoothing = 0),
+        contours =list(showlabels = TRUE))  %>%  colorbar(title = "NO tto ") 

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1544456600475.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2419722066",
+    "id" : "C9DDEC7",
+    "lastKnownWriteTime" : 1539165878,
+    "last_content_update" : 1539165878,
+    "path" : "C:/R/Exp2016/DEF_Scripts/AnalisisMV_DefScripts/analisisRManova_MiguelIbanez.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "22,55",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

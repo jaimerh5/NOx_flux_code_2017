@@ -1,0 +1,160 @@
+## Carga las librerias necesarias para los analisis
+## Si no est?n instalados lo paquetes debes instalarlos
+library(RColorBrewer)
+## Para importar datos como hojas excell
+library(readxl)
+## Para estimar modelos lineales mixtos (mixed effect models)
+##Definicion Modelo mixto (MIXED):
+# Propuesta de modelo estad´ıstico adecuada cuando la variable
+# respuesta sigue una distribuci´on Normal, permitiendo modelizar su
+# variabilidad y la presencia de observaciones correlacionadas
+library(nlme)
+## Pra la tabla Anova en modelos mixtos
+library(car)
+## Para estimar las medias en el modelo mixto
+if(!require(emmeans)){install.packages("emmeans")}
+if(!require(rcompanion)){install.packages("rcompanion")}
+if(!require(psych)){install.packages("psych")}
+if(!require(agricolae)){install.packages("agricolae")}
+if(!require(nortest)){install.packages("nortest")}
+if(!require(lsr)){install.packages("lsr")}
+if(!require(factoextra)){install.packages("factoextra")}
+if(!require(devtools)) install.packages("devtools")
+if(!require(factoextra)) install.packages("factoextra")
+setwd('C:/Users/JaimeRecio/Documents/Expmto2017/MAIZ/ANALISIS ESTADISTICO/ExpH')
+GHG_RManova<-read_excel("Rcmdr_GHG_H.xlsx")
+
+class(GHG_RManova)
+summary(GHG_RManova)
+headTail(GHG_RManova)
+## Convertir las variables caracteres en factores
+GHG_RManova$Caja<-as.factor(GHG_RManova$Caja)
+GHG_RManova$TTO<-as.factor(GHG_RManova$TTO)
+GHG_RManova$Dia<-as.factor(GHG_RManova$Dia)
+GHG_RManova$replica<-as.factor(GHG_RManova$replica)
+str(GHG_RManova)
+
+
+## An?lisis para la variable NO
+
+## Gr?fico de los valores de NO por semana y para cada TTOamiento
+coplot(N2O~Dia|TTO,GHG_RManova)
+coplot(N2O~TTO|Dia,GHG_RManova)
+#coplot=conditioning plot
+
+## Estimaci?n del modelo con los factor TTO, Semana y su interacci?n
+## Caja es un efecto aleatorio (modelo mixto)
+## corAR1 implica un modelo de autocorrelacion entre los datos a lo largo de las 8 semanas
+## varPower para contemplar la heterogeneidad de varianzas
+## lme=Linear Mixed-Effects Models
+## One approach is to define the null model as one with no fixed effects except for an intercept, indicated with a 1 on the right side of the ~
+mod.N2O<-lme(N2O~TTO+Dia+TTO:Dia,random=~1|Caja,
+             correlation=corAR1(form=~1|Caja),control=list(maxIter=100),
+             # weights=varPower(),
+             data=GHG_RManova)
+mod.N2O
+summary(mod.N2O)
+Anova(mod.N2O)
+res0<-residuals(mod.N2O,type="pearson",level=0)
+qqnorm(res0);qqline(res0)
+plotNormalHistogram(res0)
+plot(fitted(mod.N2O),residuals(mod.N2O))
+normalityTest(~N2O, test="lillie.test", data=GHG_RManova) #si sale menor que 0.05 no son normales
+
+# Lilliefors (Kolmogorov-Smirnov) normality test
+## Verificamos si hemos corregido la heterogeneidad
+plot(res0~fitted(mod.N2O)) #todos los valores<3
+abline(h=0)
+
+## Valores medios de NO para cada semana por TTOamiento
+
+#Tabla for N2O 
+with(GHG_RManova,tapply(N2O,Dia,mean))
+with(GHG_RManova,tapply(N2O,TTO,mean))
+with(GHG_RManova,tapply(N2O,Dia:TTO,mean))
+
+interaction.plot(GHG_RManova$TTO, GHG_RManova$Dia, GHG_RManova$N2O, 
+                 col = colores) #colors()[grep("red",colors())][1:8])
+interaction.plot(GHG_RManova$Dia, GHG_RManova$TTO, GHG_RManova$N2O, 
+                 col = colores) #colors()[grep("red",colors())][1:8])
+colores <- c('green','navyblue','red','purple','yellow','brown','orangered1','violetred4')
+## Medias estimadas para cada Semana por TTOamiento
+library(emmeans) #Estimated marginal means (Least-squares means)
+medias<-emmeans(mod.N2O,~TTO|Dia)
+medias
+contrast(medias,method="pairwise")
+
+## Gr?fico con las medias estimadas en cada TTOamiento por semanas
+## ## 
+plot(medias,horizontal=FALSE)
+###################################################################
+###################################################################
+##################################################################
+#Voy a quitar dias y voy a transformar en  Log
+
+setwd('C:/Users/JaimeRecio/Documents/Expmto2017/MAIZ/ANALISIS ESTADISTICO')
+GHG_lupa<-read_excel("Rcmdr_GHG_H_menos dias.xlsx")
+
+class(GHG_lupa)
+summary(GHG_lupa)
+headTail(GHG_lupa)
+## Convertir las variables caracteres en factores
+GHG_lupa$Caja<-as.factor(GHG_lupa$Caja)
+GHG_lupa$TTO<-as.factor(GHG_lupa$TTO)
+GHG_lupa$Dia<-as.factor(GHG_lupa$Dia)
+GHG_lupa$replica<-as.factor(GHG_lupa$replica)
+str(GHG_lupa)
+
+
+## An?lisis para la variable NO
+
+## Gr?fico de los valores de NO por semana y para cada TTOamiento
+coplot(N2O~Dia|TTO,GHG_lupa)
+coplot(N2O~TTO|Dia,GHG_lupa)
+#coplot=conditioning plot
+
+## Estimaci?n del modelo con los factor TTO, Semana y su interacci?n
+## Caja es un efecto aleatorio (modelo mixto)
+## corAR1 implica un modelo de autocorrelacion entre los datos a lo largo de las 8 semanas
+## varPower para contemplar la heterogeneidad de varianzas
+## lme=Linear Mixed-Effects Models
+## One approach is to define the null model as one with no fixed effects except for an intercept, indicated with a 1 on the right side of the ~
+mod2.N2O<-lme(N2O~TTO+Dia+TTO:Dia,random=~1|Caja,
+             correlation=corAR1(form=~1|Caja),control=list(maxIter=100),
+             # weights=varPower(),
+             data=GHG_lupa)
+mod2.N2O
+summary(mod2.N2O)
+Anova(mod2.N2O)
+res0<-residuals(mod2.N2O,type="pearson",level=0)
+qqnorm(res0);qqline(res0)
+plotNormalHistogram(res0)
+plot(fitted(mod2.N2O),residuals(mod2.N2O))
+normalityTest(~N2O, test="lillie.test", data=GHG_lupa) #si sale menor que 0.05 no son normales
+
+# Lilliefors (Kolmogorov-Smirnov) normality test
+## Verificamos si hemos corregido la heterogeneidad
+plot(res0~fitted(mod2.N2O)) #todos los valores<3
+abline(h=0)
+
+## Valores medios de NO para cada semana por TTOamiento
+
+#Tabla for N2O 
+with(GHG_lupa,tapply(N2O,Dia,mean))
+with(GHG_lupa,tapply(N2O,TTO,mean))
+with(GHG_lupa,tapply(N2O,Dia:TTO,mean))
+
+interaction.plot(GHG_lupa$TTO, GHG_lupa$Dia, GHG_lupa$N2O, 
+                 col = colores) #colors()[grep("red",colors())][1:8])
+interaction.plot(GHG_lupa$Dia, GHG_lupa$TTO, GHG_lupa$N2O, 
+                 col = colores) #colors()[grep("red",colors())][1:8])
+colores <- c('green','navyblue','red','purple','yellow','brown','orangered1','violetred4')
+## Medias estimadas para cada Semana por TTOamiento
+library(emmeans) #Estimated marginal means (Least-squares means)
+medias<-emmeans(mod2.N2O,~TTO|Dia)
+medias
+contrast(medias,method="pairwise")
+
+## Gr?fico con las medias estimadas en cada TTOamiento por semanas
+## ## 
+plot(medias,horizontal=FALSE)

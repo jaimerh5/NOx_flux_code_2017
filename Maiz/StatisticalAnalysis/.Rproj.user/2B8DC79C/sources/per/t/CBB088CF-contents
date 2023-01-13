@@ -1,0 +1,127 @@
+setwd('C:/Users/JaimeRecio/Documents/Expmto2017/MAIZ/ANALISIS ESTADISTICO')
+RMsuelo_H<-read_excel('Rsuelo_allSin.xlsx')
+RMsuelo_H$Date_AllSin <- as.POSIXct(RMsuelo_H$Date_AllSin, format='%Y/%m/%d')
+class(RMsuelo_H)
+summary(RMsuelo_H)
+headTail(RMsuelo_H)
+## Convertir las variables caracteres en factores
+RMsuelo_H$TTO_AllSin<-as.factor(RMsuelo_H$TTO_AllSin)
+RMsuelo_H$Rep_AllSin<-as.factor(RMsuelo_H$Rep_AllSin)
+RMsuelo_H$Dia_AllSin<-as.factor(RMsuelo_H$Dia_AllSin)
+
+str(RMsuelo_H)
+summary(RMsuelo_H)
+## An?lisis para la variable NO
+
+## Gr?fico de los valores de NO por semana y para cada TTO_AllSinamiento
+coplot(NH4_allSin~Dia_AllSin|TTO_AllSin,RMsuelo_H,ty='o')
+coplot(NO3_allSin~Dia_AllSin|TTO_AllSin,RMsuelo_H)
+xyplot(NH4_allSin~Dia_AllSin|factor(TTO_AllSin),data=RMsuelo_H,ty='o')
+#coplot=conditioning plot
+
+## Estimaci?n del modelo con los factor TTO_AllSin, Semana y su interacci?n
+## Caja es un efecto aleatorio (modelo mixto)
+## corAR1 implica un modelo de autocorrelacion entre los datos a lo largo de las 8 semanas
+## varPower para contemplar la heterogeneidad de varianzas
+## lme=Linear Mixed-Effects Models
+## One approach is to define the null model as one with no fixed effects except for an intercept, indicated with a 1 on the right side of the ~
+ayTT <-with(RMsuelo_H,tapply(NH4_allSin,TTO_AllSin,mean,na.rm=T))
+ayTT <- as.matrix(ayTT)
+
+
+mod.NH4<-lme(NH4_allSin~TTO_AllSin+Dia_AllSin+TTO_AllSin:Dia_AllSin,random=~1|Rep_AllSin,
+          correlation=corAR1(form=~1|Rep_AllSin),control=list(maxIter=100),
+          # weights=varPower(),
+          data=RMsuelo_H)
+mod.NH4
+summary(mod.NH4)
+Anova(mod.NH4)
+res0<-residuals(mod.NH4,type="pearson",level=0)
+qqnorm(res0);qqline(res0)
+plotNormalHistogram(res0)
+plot(fitted(mod.NH4),residuals(mod.NH4))
+normalityTest(~NH4_allSin, test="lillie.test", data=RMsuelo_H) #si sale menor que 0.05 no son normales
+
+# Lilliefors (Kolmogorov-Smirnov) normality test
+## Verificamos si hemos corregido la heterogeneidad
+plot(res0~fitted(mod.NH4)) #todos los valores<3
+abline(h=0)
+
+## Valores medios de NO para cada semana por TTO_AllSinamiento
+
+#Tabla for NH4_allSin 
+with(RMsuelo_H,tapply(NH4_allSin,Dia_AllSin,mean))
+with(RMsuelo_H,tapply(NH4_allSin,Dia_AllSin:TTO_AllSin,mean))
+interaction.plot(RMsuelo_H$TTO_AllSin, RMsuelo_H$Dia_AllSin, RMsuelo_H$NH4_allSin, 
+                 col = colores) #colors()[grep("red",colors())][1:8])
+interaction.plot(RMsuelo_H$Dia_AllSin, RMsuelo_H$TTO_AllSin, RMsuelo_H$NH4_allSin, 
+                 col = colores) #colors()[grep("red",colors())][1:8])
+colores <- c('green','navyblue','red','purple','yellow','brown','orangered1','violetred4')
+## Medias estimadas para cada Semana por TTO_AllSinamiento
+library(emmeans) #Estimated marginal means (Least-squares means)
+medias<-emmeans(mod.NH4,~TTO_AllSin|Dia_AllSin)
+medias
+contrast(medias,method="pairwise")
+xyplot(NH4_allSin~Dia_AllSin|factor(TTO_AllSin),data=RMsuelo_H,ty='o')
+## Gr?fico con las medias estimadas en cada TTOpor semanas
+## ## 
+windows()
+plot(medias,horizontal=FALSE)
+#################################################################
+#NO3
+
+## Gr?fico de los valores de NO por semana y para cada TTO_AllSinamiento
+coplot(NO3_allSin~Dia_AllSin|TTO_AllSin,RMsuelo_H)
+coplot(NO3_allSin~TTO_AllSin|Dia_AllSin,RMsuelo_H)
+xyplot(NO3_allSin~Dia_AllSin|factor(TTO_AllSin),data=RMsuelo_H,ty='o')
+#coplot=conditioning plot
+
+## Estimaci?n del modelo con los factor TTO_AllSin, Semana y su interacci?n
+## Caja es un efecto aleatorio (modelo mixto)
+## corAR1 implica un modelo de autocorrelacion entre los datos a lo largo de las 8 semanas
+## varPower para contemplar la heterogeneidad de varianzas
+## lme=Linear Mixed-Effects Models
+## One approach is to define the null model as one with no fixed effects except for an intercept, indicated with a 1 on the right side of the ~
+ayTT <-with(RMsuelo_H,tapply(NO3_allSin,TTO_AllSin,mean,na.rm=T))
+ayTT <- as.matrix(ayTT)
+
+
+mod.NO3<-lme(NO3_allSin~TTO_AllSin+Dia_AllSin+TTO_AllSin:Dia_AllSin,random=~1|Rep_AllSin,
+             correlation=corAR1(form=~1|Rep_AllSin),control=list(maxIter=100),
+             # weights=varPower(),
+             data=RMsuelo_H)
+mod.NO3
+summary(mod.NO3)
+Anova(mod.NO3)
+res0<-residuals(mod.NO3,type="pearson",level=0)
+qqnorm(res0);qqline(res0)
+plotNormalHistogram(res0)
+plot(fitted(mod.NO3),residuals(mod.NO3))
+normalityTest(~NO3_allSin, test="lillie.test", data=RMsuelo_H) #si sale menor que 0.05 no son normales
+
+# Lilliefors (Kolmogorov-Smirnov) normality test
+## Verificamos si hemos corregido la heterogeneidad
+plot(res0~fitted(mod.NO3)) #todos los valores<3
+abline(h=0)
+
+## Valores medios de NO para cada semana por TTO_AllSinamiento
+
+#Tabla for NO3_allSin 
+with(RMsuelo_H,tapply(NO3_allSin,TTO_AllSin,mean))
+with(RMsuelo_H,tapply(NO3_allSin,Dia_AllSin,mean))
+with(RMsuelo_H,tapply(NO3_allSin,Dia_AllSin:TTO_AllSin,mean))
+interaction.plot(RMsuelo_H$TTO_AllSin, RMsuelo_H$Dia_AllSin, RMsuelo_H$NO3_allSin, 
+                 col = colores) #colors()[grep("red",colors())][1:8])
+interaction.plot(RMsuelo_H$Dia_AllSin, RMsuelo_H$TTO_AllSin, RMsuelo_H$NO3_allSin, 
+                 col = colores) #colors()[grep("red",colors())][1:8])
+colores <- c('green','navyblue','red','purple','yellow','brown','orangered1','violetred4')
+## Medias estimadas para cada Semana por TTO_AllSinamiento
+library(emmeans) #Estimated marginal means (Least-squares means)
+medias<-emmeans(mod.NO3,~TTO_AllSin|Dia_AllSin)
+medias
+contrast(medias,method="pairwise")
+xyplot(NO3_allSin~Dia_AllSin|factor(TTO_AllSin),data=RMsuelo_H,ty='o')
+## Gr?fico con las medias estimadas en cada TTOpor semanas
+## ## 
+windows()
+plot(medias,horizontal=FALSE)

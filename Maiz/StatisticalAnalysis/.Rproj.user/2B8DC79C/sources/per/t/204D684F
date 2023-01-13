@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1544464083677.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4212141566",
+    "id" : "204D684F",
+    "lastKnownWriteTime" : 1545216895,
+    "last_content_update" : 1545216895052,
+    "path" : "C:/R/Expmto2017/MAIZ/EurochemScripts/StatisticalAnalysis/AnalisysRMAnova.R",
+    "project_path" : "AnalisysRMAnova.R",
+    "properties" : {
+        "cursorPosition" : "22,55",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
